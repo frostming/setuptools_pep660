@@ -8,7 +8,7 @@ Create a wheel that, when installed, will make the source package 'editable'
 
 import os
 import time
-from pathlib import Path
+import base64
 
 from distutils.core import Command
 from distutils.errors import DistutilsError
@@ -47,9 +47,9 @@ class editable_wheel(Command):
         # the .pth file should point to target
         self.egg_base = ei.egg_base
         self.target = pkg_resources.normalize_path(self.egg_base)
-        self.dist_info_dir = Path(
-            (ei.egg_info[: -len(".egg-info")] + ".dist-info").rpartition("/")[-1]
-        )
+        self.dist_info_dir = (
+            ei.egg_info[: -len(".egg-info")] + ".dist-info"
+        ).rpartition("/")[-1]
 
     def build_editable_wheel(self):
         if getattr(self.distribution, "use_2to3", False):
@@ -76,18 +76,19 @@ class editable_wheel(Command):
         )
         project.add_to_path(self.target)
 
-        dist_dir = Path(self.dist_dir)
+        dist_dir = self.dist_dir
         dist_info_dir = self.dist_info_dir
+        dist_info_path = os.path.join(dist_dir, dist_info_dir)
         fullname = self.distribution.metadata.get_fullname()
         # superfluous 'ed' tag is only a hint to the user,
         # and guarantees we can't overwrite the normal wheel
-        wheel_name = f"{fullname}-ed.py3-none-any.whl"
-        wheel_path = dist_dir / wheel_name
+        wheel_name = "{}-ed.py3-none-any.whl".format(fullname)
+        wheel_path = os.path.join(dist_dir, wheel_name)
 
-        wheelmeta_builder(dist_dir / dist_info_dir / "WHEEL")
+        wheelmeta_builder(os.path.join(dist_info_path, "WHEEL"))
 
-        if wheel_path.exists():
-            wheel_path.unlink()
+        if os.path.exists(wheel_path):
+            os.unlink(wheel_path)
 
         with zipfile.ZipFile(
             wheel_path, "a", compression=zipfile.ZIP_DEFLATED
@@ -100,19 +101,17 @@ class editable_wheel(Command):
                 )
 
             # copy .dist-info directory
-            for f in sorted(os.listdir(dist_dir / dist_info_dir)):
-                with (dist_dir / dist_info_dir / f).open() as metadata:
+            for f in sorted(os.listdir(dist_info_path)):
+                with open(os.path.join(dist_info_path, f)) as metadata:
                     archive.writestr(
                         zipfile.ZipInfo(
-                            str(dist_info_dir / f), time.gmtime(SOURCE_EPOCH_ZIP)[:6]
+                            os.path.join(dist_info_dir, f).replace("\\", "/"),
+                            time.gmtime(SOURCE_EPOCH_ZIP)[:6],
                         ),
                         metadata.read(),
                     )
 
             add_manifest(archive, dist_info_dir)
-
-
-import base64
 
 
 def urlsafe_b64encode(data):
@@ -136,11 +135,11 @@ def add_manifest(archive, dist_info_dir):
         digest = "sha256=" + (urlsafe_b64encode(digest).decode("ascii"))
         lines.append("%s,%s,%s" % (f.replace(",", ",,"), digest, size))
 
-    record_path = dist_info_dir / "RECORD"
-    lines.append(str(record_path) + ",,")
+    record_path = os.path.join(dist_info_dir, "RECORD").replace("\\", "/")
+    lines.append(record_path + ",,")
     RECORD = "\n".join(lines)
     archive.writestr(
-        zipfile.ZipInfo(str(record_path), time.gmtime(SOURCE_EPOCH_ZIP)[:6]), RECORD
+        zipfile.ZipInfo(record_path, time.gmtime(SOURCE_EPOCH_ZIP)[:6]), RECORD
     )
     archive.close()
 
