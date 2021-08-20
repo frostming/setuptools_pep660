@@ -1,14 +1,6 @@
-*~
-.*
-*.c
-*.o
-*.orig
-*.pyc
-*.so
-*.*-info
-*.whl
 build
 dist
 __pycache__
 docs/_build
 PKG-INFO
+*.egg-info/

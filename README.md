@@ -9,7 +9,7 @@ Use as PEP 517 backend:
 # pyproject.toml
 
 [build-system]
-requires = [setuptools_pep660]
+requires = ["setuptools_pep660"]
 build-backend = "setuptools_pep660"
 ```
 
