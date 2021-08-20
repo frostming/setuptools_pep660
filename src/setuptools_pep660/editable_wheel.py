@@ -69,12 +69,6 @@ class editable_wheel(Command):
         # ...
 
         import zipfile
-        import editables
-
-        project = editables.EditableProject(
-            self.distribution.metadata.name, self.target
-        )
-        project.add_to_path(self.target)
 
         dist_dir = self.dist_dir
         dist_info_dir = self.dist_info_dir
@@ -93,12 +87,13 @@ class editable_wheel(Command):
         with zipfile.ZipFile(
             wheel_path, "a", compression=zipfile.ZIP_DEFLATED
         ) as archive:
-
+            pth_file = "{}.pth".format(self.distribution.metadata.name)
+            pth_content = "{}\n".format(self.target).encode("utf8")
             # copy .pth file
-            for f, data in project.files():
-                archive.writestr(
-                    zipfile.ZipInfo(f, time.gmtime(SOURCE_EPOCH_ZIP)[:6]), data
-                )
+            archive.writestr(
+                zipfile.ZipInfo(pth_file, time.gmtime(SOURCE_EPOCH_ZIP)[:6]),
+                pth_content,
+            )
 
             # copy .dist-info directory
             for f in sorted(os.listdir(dist_info_path)):
