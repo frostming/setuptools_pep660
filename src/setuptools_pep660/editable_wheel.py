@@ -7,6 +7,7 @@ Create a wheel that, when installed, will make the source package 'editable'
 # TODO doesn't behave when called outside the hook
 
 import os
+import sys
 import time
 import base64
 
@@ -76,7 +77,8 @@ class editable_wheel(Command):
         fullname = self.distribution.metadata.get_fullname()
         # superfluous 'ed' tag is only a hint to the user,
         # and guarantees we can't overwrite the normal wheel
-        wheel_name = "{}-ed.py3-none-any.whl".format(fullname)
+        pytag = "py2.py3" if sys.version_info < (3,) else "py3"
+        wheel_name = "{}-ed.{}-none-any.whl".format(fullname, pytag)
         wheel_path = os.path.join(dist_dir, wheel_name)
 
         wheelmeta_builder(os.path.join(dist_info_path, "WHEEL"))
