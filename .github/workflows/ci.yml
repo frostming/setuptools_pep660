@@ -14,11 +14,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install Dependencies
+        run: python -m pip install -U nox
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Dependencies
-        run: python -m pip install -U nox
       - name: Run Tests
         run: nox -p ${{ matrix.python-version }}
