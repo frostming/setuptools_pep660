@@ -98,11 +98,12 @@ class editable_wheel(Command):
             )
 
             # copy .dist-info directory
+            wheel_dist_info = "{}.dist-info".format(fullname)
             for f in sorted(os.listdir(dist_info_path)):
                 with open(os.path.join(dist_info_path, f)) as metadata:
                     archive.writestr(
                         zipfile.ZipInfo(
-                            os.path.join(dist_info_dir, f).replace("\\", "/"),
+                            os.path.join(wheel_dist_info, f).replace("\\", "/"),
                             time.gmtime(SOURCE_EPOCH_ZIP)[:6],
                         ),
                         metadata.read(),
