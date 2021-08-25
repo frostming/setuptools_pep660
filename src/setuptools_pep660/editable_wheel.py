@@ -86,6 +86,7 @@ class editable_wheel(Command):
         if os.path.exists(wheel_path):
             os.unlink(wheel_path)
 
+        wheel_dist_info = "{}.dist-info".format(fullname)
         with zipfile.ZipFile(
             wheel_path, "a", compression=zipfile.ZIP_DEFLATED
         ) as archive:
@@ -98,7 +99,6 @@ class editable_wheel(Command):
             )
 
             # copy .dist-info directory
-            wheel_dist_info = "{}.dist-info".format(fullname)
             for f in sorted(os.listdir(dist_info_path)):
                 with open(os.path.join(dist_info_path, f)) as metadata:
                     archive.writestr(
@@ -109,7 +109,7 @@ class editable_wheel(Command):
                         metadata.read(),
                     )
 
-            add_manifest(archive, dist_info_dir)
+            add_manifest(archive, wheel_dist_info)
 
 
 def urlsafe_b64encode(data):
