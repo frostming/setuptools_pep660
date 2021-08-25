@@ -48,9 +48,9 @@ class editable_wheel(Command):
         # the .pth file should point to target
         self.egg_base = ei.egg_base
         self.target = pkg_resources.normalize_path(self.egg_base)
-        self.dist_info_dir = (
+        self.dist_info_dir = os.path.basename(
             ei.egg_info[: -len(".egg-info")] + ".dist-info"
-        ).rpartition("/")[-1]
+        )
 
     def build_editable_wheel(self):
         if getattr(self.distribution, "use_2to3", False):
