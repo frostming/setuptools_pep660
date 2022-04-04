@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "wheel", "setuptools>=42"
+    "wheel", "setuptools>=42,<61"
 ]
 build-backend = "setuptools_pep660"
 backend-path = ["./src"]
