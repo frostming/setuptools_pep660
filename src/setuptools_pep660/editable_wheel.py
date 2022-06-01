@@ -100,7 +100,7 @@ class editable_wheel(Command):
 
             # copy .dist-info directory
             for f in sorted(os.listdir(dist_info_path)):
-                with open(os.path.join(dist_info_path, f)) as metadata:
+                with open(os.path.join(dist_info_path, f), "rb") as metadata:
                     archive.writestr(
                         zipfile.ZipInfo(
                             os.path.join(wheel_dist_info, f).replace("\\", "/"),
