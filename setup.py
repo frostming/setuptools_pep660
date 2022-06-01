@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="setuptools_pep660",
-    version="0.1.3",
+    version="0.1.4",
     description="An experimental replacement for 'setup.py develop'",
     long_description="Implements a PEP 517 + PEP 660 backend",
     classifiers=[
